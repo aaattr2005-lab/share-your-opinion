@@ -309,3 +309,51 @@ function PlanStep({ day, title, desc }: any) {
     </div>
   );
 }
+function SurveyView({ isVoted, onFinish }: any) {
+  const [formData, setFormData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+
+  // هذه هي الرسالة التي ستظهر بعد الضغط على "إرسال"
+  if (isVoted) return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }} 
+      animate={{ opacity: 1, scale: 1 }} 
+      className="text-center py-24 bg-[#111114] border border-white/5 rounded-[40px] shadow-2xl"
+    >
+      <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <CheckCircle2 size={48} className="text-green-500" />
+      </div>
+      <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="text-white mb-4">شكراً لك!</h2>
+      <p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-400">تم استلام تقييمك بنجاح. رأيك يساعدني على التطور.</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="mt-8 text-blue-400 hover:text-blue-300 text-[14px] underline"
+      >
+        إرسال تقييم آخر (إذا كنت تستخدم جهازاً مختلفاً)
+      </button>
+    </motion.div>
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // إرسال البيانات إلى Supabase
+    const { error } = await supabase.from('responses').insert([formData]);
+    
+    if (!error) {
+      localStorage.setItem('voted_status', 'true'); // حفظ حالة الإرسال لمنع التكرار
+      onFinish(); // إخفاء الاستبيان وإظهار رسالة الشكر
+    } else {
+      alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-10 animate-in fade-in duration-700">
+      {/* ... باقي الكود الخاص بالأسئلة كما هو ... */}
+      {/* سأضع لك الكود كاملاً بالأسفل لسهولة النسخ */}
+    </form>
+  );
+}
