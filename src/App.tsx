@@ -24,12 +24,10 @@ export default function App() {
   const [responses, setResponses] = useState<any[]>([]);
   const [isVoted, setIsVoted] = useState(localStorage.getItem('voted_status') === 'true');
   
-  // التحقق من صلاحية المسؤول عبر الرابط السري ?admin=true
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
   useEffect(() => { 
     fetchResponses();
-    // إذا لم يكن مسؤولاً، نجبره دائماً على رؤية الاستبيان فقط
     if (!isAdmin) setActiveTab('survey');
   }, [isAdmin]);
 
@@ -48,16 +46,20 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
+      {/* شريط التنقل العلوي - العنوان في المنتصف */}
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
-        <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
+        <div className="max-w-5xl mx-auto px-4 flex items-center h-20 relative">
           
-          <div className="flex items-center gap-2">
-            <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap">شارك رأيك</span>
+          {/* العنوان في المنتصف تماماً */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+            <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap drop-shadow-[0_0_10px_rgba(250,204,21,0.3)]">
+              شارك رأيك
+            </span>
           </div>
 
-          {/* التعديل: تظهر الأزرار فقط إذا كان المستخدم مسؤولاً */}
+          {/* الأزرار للمسؤول فقط (تظهر في الجهة اليسرى في RTL) */}
           {isAdmin && (
-            <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
+            <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d] z-10">
               <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={18}/>} label="التحليل" activeColor="bg-purple-600 shadow-purple-900/20" />
               <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" activeColor="bg-blue-600 shadow-blue-900/20" />
               <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" activeColor="bg-emerald-600 shadow-emerald-900/20" />
@@ -91,9 +93,12 @@ export default function App() {
 
 function NavTab({ active, onClick, icon, label, activeColor }: any) {
   return (
-    <button onClick={onClick} className={`flex flex-col items-center justify-center w-[70px] md:w-20 h-16 rounded-xl transition-all duration-500 ${active ? `${activeColor} text-white shadow-lg scale-105` : 'text-gray-500 hover:text-gray-300'}`}>
+    <button 
+      onClick={onClick} 
+      className={`flex flex-col items-center justify-center w-[60px] md:w-20 h-14 md:h-16 rounded-xl transition-all duration-500 ${active ? `${activeColor} text-white shadow-lg scale-105` : 'text-gray-500 hover:text-gray-300'}`}
+    >
       {icon}
-      <span className="text-[10px] font-black mt-1 uppercase tracking-widest">{label}</span>
+      <span className="text-[9px] md:text-[10px] font-black mt-1 uppercase tracking-widest">{label}</span>
     </button>
   );
 }
@@ -116,7 +121,7 @@ function SurveyView({ formData, setFormData, setIsVoted, fetchResponses }: any) 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
       <div className="text-center space-y-6 mb-16">
-        <div className="inline-block px-5 py-1.5 rounded-full border border-emerald-500/20 text-emerald-400 text-xs font-bold bg-emerald-500/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
+        <div className="inline-block px-5 py-1.5 rounded-full border border-[#facc15]/20 text-[#facc15] text-xs font-bold bg-[#facc15]/5 tracking-widest uppercase mb-4 shadow-sm">تقييم شخصي وأداء مهني</div>
         <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white text-center">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
           وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
@@ -217,7 +222,7 @@ function SurveyView({ formData, setFormData, setIsVoted, fetchResponses }: any) 
         <div className="flex items-center justify-center gap-2 text-gray-500 px-6">
           <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
           <p className="text-xs md:text-sm leading-relaxed text-center font-medium">
-            نؤكد أن جميع الإجابات والملاحظات المقدمة عبر هذا الموقع تُعامل بسرية تامة ومجهولة الهوية
+            جميع الإجابات والملاحظات تُعامل بسرية تامة ومجهولة الهوية
           </p>
         </div>
       </div>
