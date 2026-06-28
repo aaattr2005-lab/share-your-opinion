@@ -102,10 +102,10 @@ function SurveyView({ isVoted, onFinish }: any) {
   return (
     <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit} className="space-y-10">
       <div className="text-center mb-16">
-        <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="mb-3">ساعدني أتطور 🚀</h2>
-        <p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-400">ملاحظاتك تساعدني في تعزيز نقاط القوة والعمل على جوانب التحسين.</p>
+              <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="mb-3 text-white">استبيان التقييم والتطوير المهني</h2>
+<p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-400 max-w-2xl mx-auto">مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.</p>
       </div>
-
+      
       {categories.map((cat, idx) => (
         <div key={idx} className="bg-[#111114] border border-white/5 p-8 rounded-3xl shadow-xl">
           <h3 style={{ fontSize: '20px', fontWeight: '600' }} className="text-blue-400 mb-8 border-r-4 border-blue-500 pr-4">{cat.title}</h3>
