@@ -8,7 +8,6 @@ const supabase = createClient(
   'sb_publishable_veEJ6znXaLQgx3MnipR7Gw_ODK46Lmo'
 );
 
-// المحاور مع الأيقونات (تم استبدال Handshake بـ Heart لضمان عمل الكود)
 const categories = [
   { title: "التواصل", icon: <MessageCircle size={24} className="text-[#facc15]" />, fields: ["q1", "q2", "q3"], questions: ["يستمع للآخرين باهتمام وتركيز", "يعبّر عن أفكاره بوضوح تام", "يحترم اختلاف الآراء ويتقبلها"] },
   { title: "الاحترافية", icon: <Star size={24} className="text-[#facc15]" />, fields: ["q4", "q5"], questions: ["يلتزم بالمواعيد ويحترم وقت الآخرين", "يُقدّم عمله بجودة ودقة عالية"] },
@@ -32,9 +31,7 @@ export default function App() {
     try {
       const { data } = await supabase.from('responses').select('*');
       if (data) setResponses(data);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const isFormComplete = () => {
@@ -46,17 +43,37 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
-      {/* شريط التنقل العلوي الفاخر */}
-      <nav className="bg-[#161b22] border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
+      
+      {/* شريط التنقل العلوي */}
+      <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
-          <div className="flex flex-col items-end">
-            <span className="text-[#facc15] font-bold text-2xl leading-none">شاركني</span>
-            <span className="text-[#facc15] font-bold text-2xl leading-tight">رأيك</span>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap">شارك رأيك</span>
           </div>
-          <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1 border border-[#30363d]">
-            <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={20}/>} label="الاستبيان" />
-            <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={20}/>} label="النتائج" />
-            <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={20}/>} label="التحليل" />
+
+          <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
+            <NavTab 
+              active={activeTab === 'analysis'} 
+              onClick={() => setActiveTab('analysis')} 
+              icon={<BrainCircuit size={18}/>} 
+              label="التحليل" 
+              activeColor="bg-purple-600 shadow-purple-900/20"
+            />
+            <NavTab 
+              active={activeTab === 'dashboard'} 
+              onClick={() => setActiveTab('dashboard')} 
+              icon={<LayoutDashboard size={18}/>} 
+              label="النتائج" 
+              activeColor="bg-blue-600 shadow-blue-900/20"
+            />
+            <NavTab 
+              active={activeTab === 'survey'} 
+              onClick={() => setActiveTab('survey')} 
+              icon={<ClipboardList size={18}/>} 
+              label="الاستبيان" 
+              activeColor="bg-emerald-600 shadow-emerald-900/20"
+            />
           </div>
         </div>
       </nav>
@@ -64,9 +81,7 @@ export default function App() {
       <main className="max-w-2xl mx-auto py-10 px-4">
         <AnimatePresence mode="wait">
           {activeTab === 'survey' ? (
-            isVoted ? (
-              <ThankYouView key="thanks" />
-            ) : (
+            isVoted ? ( <ThankYouView key="thanks" /> ) : (
               <SurveyView key="form" formData={formData} setFormData={setFormData} isComplete={isFormComplete()} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
             )
           ) : activeTab === 'dashboard' ? (
@@ -79,21 +94,21 @@ export default function App() {
 
       <footer className="text-center py-12 border-t border-[#30363d] mt-10 bg-[#161b22]/30">
         <p className="text-gray-500 text-sm">
-          صُمّم بعناية من قِبَل <span className="text-[#facc15] font-bold">عبداللطيف الشهري</span> . جميع الحقوق محفوظة © 2025
+          صُمّم بعناية من قِبَل <span className="text-[#facc15] font-bold">عبداللطيف الشهري</span> . جميع الحقوق محفوظة © 2026
         </p>
       </footer>
     </div>
   );
 }
 
-function NavTab({ active, onClick, icon, label }: any) {
+function NavTab({ active, onClick, icon, label, activeColor }: any) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex flex-col items-center justify-center w-20 h-16 rounded-xl transition-all duration-300 ${active ? 'bg-[#facc15] text-[#0d1117] shadow-[0_0_20px_rgba(250,204,21,0.2)]' : 'text-gray-500 hover:text-gray-300'}`}
+      className={`flex flex-col items-center justify-center w-[70px] md:w-20 h-16 rounded-xl transition-all duration-500 ${active ? `${activeColor} text-white shadow-lg scale-105` : 'text-gray-500 hover:text-gray-300'}`}
     >
       {icon}
-      <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] font-black mt-1 uppercase tracking-widest">{label}</span>
     </button>
   );
 }
@@ -110,20 +125,17 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       localStorage.setItem('voted_status', 'true');
       setIsVoted(true);
       fetchResponses();
-    } else {
-      alert("عذراً، حدث خطأ أثناء الإرسال.");
-    }
+    } else { alert("حدث خطأ تقني."); }
     setLoading(false);
   };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
-      {/* قسم الهيدر */}
       <div className="text-center space-y-6 mb-16">
-        <div className="inline-block px-5 py-1.5 rounded-full border border-[#facc15]/20 text-[#facc15] text-xs font-bold bg-[#facc15]/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
-        <h2 className="text-3xl md:text-4xl font-black leading-[1.3]">
+        <div className="inline-block px-5 py-1.5 rounded-full border border-emerald-500/20 text-emerald-400 text-xs font-bold bg-emerald-500/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
+        <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
-          وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
+          وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
         <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
@@ -139,22 +151,31 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           </div>
           <div className="p-10 space-y-14">
             {cat.questions.map((q, qIdx) => (
-              <div key={qIdx} className="space-y-8">
-                <p className="text-white text-xl font-medium text-right leading-relaxed">{q}</p>
-                <div className="flex justify-start gap-4" dir="ltr">
-                  {[1, 2, 3, 4, 5].map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
-                      className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
-                        ${formData[cat.fields[qIdx]] === val 
-                          ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
-                          : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
-                    >
-                      {val}
-                    </button>
-                  ))}
+              <div key={qIdx} className="space-y-8 text-right">
+                <p className="text-white text-xl font-medium leading-relaxed">{q}</p>
+                
+                <div className="space-y-4">
+                  {/* حاوية الأرقام مع التسميات ضعيف وممتاز */}
+                  <div className="flex justify-between items-center px-1">
+                    <span className="text-rose-500 text-xs font-bold">ضعيف</span>
+                    <span className="text-emerald-500 text-xs font-bold">ممتاز</span>
+                  </div>
+                  
+                  <div className="flex justify-start gap-4" dir="ltr">
+                    {[1, 2, 3, 4, 5].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
+                        className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
+                          ${formData[cat.fields[qIdx]] === val 
+                            ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
+                            : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
+                      >
+                        {val}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -162,7 +183,6 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         </div>
       ))}
 
-      {/* قسم رأيك الشخصي المحدث */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl p-10 space-y-12">
         <div className="flex items-center gap-4 mb-6 border-b border-[#30363d] pb-6">
           <div className="bg-[#facc15]/10 p-3 rounded-2xl border border-[#facc15]/20"><BrainCircuit className="text-[#facc15]" size={28} /></div>
@@ -175,7 +195,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           { id: 'p_improvements', label: 'ما الجوانب التي يمكنه تطويرها أو تحسينها؟' },
           { id: 'p_notes', label: 'هل لديك أي ملاحظة أو اقتراح إضافي؟' }
         ].map((item) => (
-          <div key={item.id} className="space-y-5">
+          <div key={item.id} className="space-y-5 text-right">
             <label className="text-white font-bold block text-lg pr-2 leading-relaxed">{item.label}</label>
             <textarea 
               required
@@ -188,7 +208,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       </div>
 
       {!isComplete && (
-        <div className="flex items-center justify-center gap-3 text-[#facc15] bg-[#facc15]/5 p-6 rounded-3xl border border-[#facc15]/20 animate-pulse">
+        <div className="flex items-center justify-center gap-3 text-amber-400 bg-amber-400/5 p-6 rounded-3xl border border-amber-400/20">
           <AlertCircle size={24} />
           <span className="text-base font-bold text-center">يرجى تقييم كافة المحاور وتعبئة الخانات النصية لتفعيل زر الإرسال.</span>
         </div>
@@ -199,15 +219,11 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         onClick={handleSubmit}
         className={`w-full py-7 rounded-full font-black text-2xl shadow-2xl transition-all duration-500 active:scale-95
           ${isComplete && !loading 
-            ? 'bg-[#facc15] text-[#0d1117] hover:bg-[#eab308] shadow-[0_10px_40px_rgba(250,204,21,0.2)] cursor-pointer' 
+            ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_10px_40px_rgba(16,185,129,0.2)] cursor-pointer' 
             : 'bg-[#161b22] text-gray-700 border border-[#30363d] cursor-not-allowed'}`}
       >
-        {loading ? 'جاري معالجة البيانات...' : 'إرسال التقييم النهائي'}
+        {loading ? 'جاري معالجة البيانات...' : 'اعتماد وإرسال التقييم'}
       </button>
-      <div className="text-center space-y-1">
-        <p className="text-gray-600 text-sm font-medium">جميع الإجابات مشفرة وسرية تماماً</p>
-        <div className="w-10 h-1 bg-[#30363d] mx-auto rounded-full mt-4"></div>
-      </div>
     </motion.div>
   );
 }
@@ -216,16 +232,15 @@ function ThankYouView() {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-32 space-y-10">
       <div className="relative inline-block">
-        <div className="w-32 h-32 bg-[#facc15]/10 rounded-full flex items-center justify-center mx-auto border border-[#facc15]/20 relative z-10">
-          <CheckCircle2 size={60} className="text-[#facc15]" />
+        <div className="w-32 h-32 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20 relative z-10">
+          <CheckCircle2 size={60} className="text-emerald-500" />
         </div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[#facc15] rounded-full blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-emerald-500 rounded-full blur-3xl opacity-10 animate-pulse"></div>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 text-center">
         <h2 className="text-5xl font-black text-white tracking-tighter">مُمتن لك!</h2>
         <p className="text-gray-400 text-xl max-w-sm mx-auto leading-relaxed">تم استلام تقييمك بنجاح. رأيك الصادق سيصنع فرقاً حقيقياً في رحلة تطوري.</p>
       </div>
-      <button onClick={() => window.location.reload()} className="text-[#facc15] font-bold text-sm underline opacity-50 hover:opacity-100 transition-opacity">العودة للاستبيان</button>
     </motion.div>
   );
 }
@@ -233,49 +248,38 @@ function ThankYouView() {
 function DashboardView({ responses, isAdmin, setIsVoted }: any) {
   return (
     <div className="text-center py-24 space-y-10">
-      <div className="bg-[#161b22] border border-[#30363d] p-12 rounded-[3rem] shadow-2xl space-y-8">
-        <Trophy size={80} className="text-[#facc15] mx-auto opacity-20" />
+      <div className="bg-[#161b22] border border-blue-500/20 p-12 rounded-[3rem] shadow-2xl space-y-8">
+        <Trophy size={80} className="text-blue-500 mx-auto opacity-20" />
         <h2 className="text-4xl font-black text-white tracking-tight">إحصائيات المشاركة</h2>
         <div className="flex flex-col items-center">
-            <span className="text-7xl font-black text-[#facc15] leading-none">{responses?.length || 0}</span>
+            <span className="text-7xl font-black text-blue-500 leading-none">{responses?.length || 0}</span>
             <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4">رد مكتمل</span>
         </div>
         
-        <div className="pt-8 grid grid-cols-2 gap-4">
-            <div className="bg-[#0d1117] p-6 rounded-3xl border border-[#30363d]">
-                <p className="text-gray-500 text-xs font-bold mb-1">المتوسط العام</p>
-                <p className="text-[#facc15] text-2xl font-black">4.8</p>
-            </div>
-            <div className="bg-[#0d1117] p-6 rounded-3xl border border-[#30363d]">
-                <p className="text-gray-500 text-xs font-bold mb-1">معدل الدقة</p>
-                <p className="text-[#facc15] text-2xl font-black">100%</p>
-            </div>
-        </div>
-
         {isAdmin && (
-          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-[#facc15]/10 text-[#facc15] px-6 py-2 rounded-full text-xs font-bold border border-[#facc15]/20 flex items-center gap-2 mx-auto hover:bg-[#facc15] hover:text-[#0d1117] transition-all">
+          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all text-right">
             <RefreshCcw size={14}/> تفعيل وضع المعاينة
           </button>
         )}
       </div>
-      <p className="text-gray-600 text-sm italic italic">الرسوم البيانية التفاعلية يتم توليدها حالياً بناءً على البيانات المستلمة...</p>
+      <p className="text-gray-600 text-sm italic">لوحة البيانات التحليلية يتم تحديثها الآن...</p>
     </div>
   );
 }
 
 function AnalysisView({ responses }: any) {
   return (
-    <div className="bg-[#161b22] border border-[#30363d] p-20 rounded-[4rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center space-y-10 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#facc15] rounded-full blur-[120px] opacity-[0.03]"></div>
-      <div className="w-28 h-28 bg-[#facc15]/5 text-[#facc15] rounded-[2.5rem] flex items-center justify-center mx-auto border border-[#facc15]/10 shadow-[0_0_40px_rgba(250,204,21,0.05)]">
+    <div className="bg-[#161b22] border border-purple-500/20 p-20 rounded-[4rem] shadow-2xl text-center space-y-10 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600 rounded-full blur-[120px] opacity-[0.03]"></div>
+      <div className="w-28 h-28 bg-purple-600/5 text-purple-500 rounded-[2.5rem] flex items-center justify-center mx-auto border border-purple-500/10">
         <BrainCircuit size={56} />
       </div>
       <div className="space-y-4">
-        <h2 className="text-4xl font-black text-white tracking-tighter uppercase">التحليل الذكي</h2>
-        <div className="w-12 h-1 bg-[#facc15] mx-auto rounded-full"></div>
+        <h2 className="text-4xl font-black text-white tracking-tighter">التحليل الذكي</h2>
+        <div className="w-12 h-1 bg-purple-500 mx-auto rounded-full"></div>
       </div>
       <p className="text-gray-400 max-w-md mx-auto text-xl leading-relaxed italic opacity-80">
-        يتم حالياً تحليل {responses?.length || 0} مشاركة لاستخراج الأنماط السلوكية العميقة وتحديد سماتك القيادية بدقة متناهية.
+        يتم حالياً معالجة {responses?.length || 0} رد لاستخراج الأنماط السلوكية العميقة.
       </p>
     </div>
   );
