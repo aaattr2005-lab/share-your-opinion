@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, AlertCircle, RefreshCcw, Heart } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, AlertCircle, RefreshCcw, Heart, ShieldCheck } from 'lucide-react';
 
 const supabase = createClient(
   'https://qeqkcvoewqebzqqjmrez.supabase.co',
@@ -44,7 +44,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
-      {/* شريط التنقل العلوي */}
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
           
@@ -135,7 +134,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         <div className="inline-block px-5 py-1.5 rounded-full border border-emerald-500/20 text-emerald-400 text-xs font-bold bg-emerald-500/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
         <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white text-center">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
-          وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية
+          وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
         <div className="space-y-4">
@@ -160,7 +159,6 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
             {cat.questions.map((q, qIdx) => (
               <div key={qIdx} className="space-y-8 text-right">
                 <p className="text-white text-xl font-medium leading-relaxed">{q}</p>
-                
                 <div className="flex justify-start gap-4" dir="ltr">
                   {[1, 2, 3, 4, 5].map((val) => (
                     <button
@@ -211,16 +209,26 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         </div>
       )}
 
-      <button 
-        disabled={!isComplete || loading}
-        onClick={handleSubmit}
-        className={`w-full py-7 rounded-full font-black text-2xl shadow-2xl transition-all duration-500 active:scale-95
-          ${isComplete && !loading 
-            ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_10px_40px_rgba(16,185,129,0.2)] cursor-pointer' 
-            : 'bg-[#161b22] text-gray-700 border border-[#30363d] cursor-not-allowed'}`}
-      >
-        {loading ? 'جاري معالجة البيانات...' : 'إرسال التقييم النهائي'}
-      </button>
+      <div className="space-y-6">
+        <button 
+          disabled={!isComplete || loading}
+          onClick={handleSubmit}
+          className={`w-full py-7 rounded-full font-black text-2xl shadow-2xl transition-all duration-500 active:scale-95
+            ${isComplete && !loading 
+              ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_10px_40px_rgba(16,185,129,0.2)] cursor-pointer' 
+              : 'bg-[#161b22] text-gray-700 border border-[#30363d] cursor-not-allowed'}`}
+        >
+          {loading ? 'جاري معالجة البيانات...' : 'إرسال التقييم النهائي'}
+        </button>
+
+        {/* النص الجديد المطلوب أسفل زر الإرسال */}
+        <div className="flex items-center justify-center gap-2 text-gray-500 px-6">
+          <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
+          <p className="text-xs md:text-sm leading-relaxed text-center font-medium">
+            نؤكد أن جميع الإجابات والملاحظات المقدمة عبر هذا الموقع تُعامل بسرية تامة ومجهولة الهوية
+          </p>
+        </div>
+      </div>
     </motion.div>
   );
 }
