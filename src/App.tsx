@@ -36,7 +36,6 @@ export default function App() {
 
   const isFormComplete = () => {
     const questionFields = categories.flatMap(c => c.fields);
-    // تم الإبقاء فقط على الوصف العام والملاحظات
     const textFields = ["p_desc", "p_notes"];
     const allRequired = [...questionFields, ...textFields];
     return allRequired.every(f => formData[f] && String(formData[f]).trim() !== "");
@@ -45,6 +44,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
+      {/* شريط التنقل العلوي */}
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
           
@@ -138,9 +138,17 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
-        <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
-          مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
-        </p>
+        <div className="space-y-4">
+          <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
+            مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
+          </p>
+          {/* الجملة الجديدة المطلوبة */}
+          <div className="bg-[#facc15]/5 border border-[#facc15]/20 p-5 rounded-2xl max-w-xl mx-auto">
+            <p className="text-[#facc15] text-sm leading-relaxed font-medium">
+              يرجى تقييم العبارات التالية باستخدام مقياس خماسي، حيث يعكس الرقم (1) أقل درجة من الرضا أو التوافق، بينما يعكس الرقم (5) أعلى درجة من الرضا أو التوافق.
+            </p>
+          </div>
+        </div>
       </div>
 
       {categories.map((cat, idx) => (
@@ -205,7 +213,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       </div>
 
       {!isComplete && (
-        <div className="flex items-center justify-center gap-3 text-amber-400 bg-amber-400/5 p-6 rounded-3xl border border-amber-400/20">
+        <div className="flex items-center justify-center gap-3 text-amber-400 bg-amber-400/5 p-6 rounded-3xl border border-amber-400/20 shadow-sm animate-pulse">
           <AlertCircle size={24} />
           <span className="text-base font-bold text-center">يرجى تقييم كافة المحاور وتعبئة الخانات النصية لتفعيل زر الإرسال.</span>
         </div>
