@@ -4,7 +4,7 @@ import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler,
 import { Radar, Bar } from 'react-chartjs-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import { LayoutDashboard, ClipboardList, BrainCircuit, Download, CheckCircle2, Star, Target, Lightbulb, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, BrainCircuit, Download, CheckCircle2, Star, Target, Lightbulb, TrendingUp, AlertCircle } from 'lucide-react';
 
 // --- إعدادات الربط بقاعدة البيانات ---
 const supabase = createClient(
@@ -40,12 +40,11 @@ export default function App() {
   };
 
   return (
-    // الخلفية أزرق فاتح مريح للعين
     <div className="min-h-screen bg-[#f0f7ff] text-slate-900 font-['IBM_Plex_Sans_Arabic']" dir="rtl">
       {/* الهيدر العلوي */}
       <nav className="border-b border-blue-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
-          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">شارك رأيك</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">عبداللطيف الشهري</h1>
           <div className="flex bg-blue-50 p-1.5 rounded-2xl gap-1 border border-blue-100">
             <TabButton active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" />
             <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" />
@@ -78,6 +77,19 @@ function SurveyView({ isVoted, onFinish }: any) {
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
+  // دالة للتحقق من أن المستخدم أجاب على كل شيء
+  const isFormComplete = () => {
+    const allQuestionFields = categories.flatMap(cat => cat.fields);
+    const requiredFields = [...allQuestionFields, "best_trait", "to_improve"];
+    
+    return requiredFields.every(field => {
+        const val = formData[field];
+        return val !== undefined && val !== null && String(val).trim() !== "";
+    });
+  };
+
+  const isComplete = isFormComplete();
+
   if (isVoted) return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-20 bg-white border border-blue-100 rounded-[40px] shadow-sm">
       <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-green-100">
@@ -90,6 +102,7 @@ function SurveyView({ isVoted, onFinish }: any) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isComplete) return;
     setLoading(true);
     const { error } = await supabase.from('responses').insert([formData]);
     if (!error) {
@@ -104,8 +117,8 @@ function SurveyView({ isVoted, onFinish }: any) {
   return (
     <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit} className="space-y-12">
       <div className="text-center space-y-4 mb-16">
-        <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="text-blue-900">أنا عبداللطيف الشهري، وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية من الأشخاص الذين تعاملوا معي</h2>
-        <p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-600 max-w-2xl mx-auto">مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.</p>
+        <h2 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-900 leading-relaxed">أنا عبداللطيف الشهري، وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية من الأشخاص الذين تعاملوا معي</h2>
+        <p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-600 max-w-2xl mx-auto">مشاركتكم الصادقة تساهم بفاعلية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.</p>
       </div>
 
       {categories.map((cat, idx) => (
@@ -142,8 +155,25 @@ function SurveyView({ isVoted, onFinish }: any) {
         </div>
       </div>
 
-      <button disabled={loading} type="submit" className="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-xl transition-all font-bold text-lg">
+      {/* رسالة تنبيه تظهر فقط إذا كان النموذج غير مكتمل */}
+      {!isComplete && (
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center gap-3 text-amber-700">
+          <AlertCircle size={20} />
+          <span className="font-medium text-[15px]">يرجى إكمال جميع التقييمات والإجابات النصية لتفعيل زر الإرسال.</span>
+        </div>
+      )}
+
+      <button 
+        disabled={!isComplete || loading} 
+        type="submit" 
+        className={`w-full py-6 rounded-2xl shadow-xl transition-all font-bold text-lg flex items-center justify-center gap-3
+          ${isComplete && !loading 
+            ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer active:scale-95' 
+            : 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-70'
+          }`}
+      >
         {loading ? 'جاري الإرسال...' : 'اعتماد وإرسال البيانات'}
+        {isComplete && !loading && <CheckCircle2 size={20} />}
       </button>
     </motion.form>
   );
