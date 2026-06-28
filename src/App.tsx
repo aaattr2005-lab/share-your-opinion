@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, AlertCircle, RefreshCcw, Heart, ShieldCheck } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, RefreshCcw, Heart, ShieldCheck } from 'lucide-react';
 
 const supabase = createClient(
   'https://qeqkcvoewqebzqqjmrez.supabase.co',
@@ -34,12 +34,6 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
-  // تعديل الشرط: الآن الخانات النصية فقط هي الإلزامية (لأن التقييمات اختيارية بناءً على طلبك)
-  const isFormComplete = () => {
-    const textFields = ["p_desc", "p_notes"];
-    return textFields.every(f => formData[f] && String(formData[f]).trim() !== "");
-  };
-
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
@@ -60,7 +54,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'survey' ? (
             isVoted ? ( <ThankYouView key="thanks" /> ) : (
-              <SurveyView formData={formData} setFormData={setFormData} isComplete={isFormComplete()} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
+              <SurveyView formData={formData} setFormData={setFormData} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
             )
           ) : activeTab === 'dashboard' ? (
             <DashboardView responses={responses} isAdmin={isAdmin} setIsVoted={setIsVoted} />
@@ -88,12 +82,11 @@ function NavTab({ active, onClick, icon, label, activeColor }: any) {
   );
 }
 
-function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchResponses }: any) {
+function SurveyView({ formData, setFormData, setIsVoted, fetchResponses }: any) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (!isComplete) return;
     setLoading(true);
     const { error } = await supabase.from('responses').insert([formData]);
     if (!error) {
@@ -121,7 +114,6 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
             <p className="text-[#facc15] text-sm leading-relaxed font-bold text-center">
               يرجى تقييم العبارات التالية باستخدام مقياس خماسي، حيث يعكس الرقم (1) أقل درجة من الرضا أو التوافق، بينما يعكس الرقم (5) أعلى درجة من الرضا أو التوافق.
             </p>
-            {/* الجملة الجديدة المضافة هنا */}
             <p className="text-white/70 text-xs leading-relaxed text-center">
               في حال عدم توفر معرفة كافية للإجابة على أي سؤال، نرجو تركه فارغًا وعدم اختيار أي تقييم، لضمان دقة وموضوعية النتائج.
             </p>
@@ -153,7 +145,6 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
                       {val}
                     </button>
                   ))}
-                  {/* زر مسح الاختيار (إذا أراد المستخدم تركه فارغاً بعد أن اختار بالخطأ) */}
                   {formData[cat.fields[qIdx]] && (
                     <button 
                        type="button"
@@ -187,8 +178,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           <div key={item.id} className="space-y-5">
             <label className="text-white font-bold block text-lg pr-2 leading-relaxed">{item.label}</label>
             <textarea 
-              required
-              placeholder="اكتب إجابتك هنا بكل شفافية..."
+              placeholder="اكتب إجابتك هنا (اختياري)..."
               className="w-full bg-[#0d1117] border border-[#30363d] rounded-3xl p-6 text-white text-lg outline-none focus:border-[#facc15] focus:ring-4 focus:ring-[#facc15]/5 transition-all min-h-[150px] placeholder:text-gray-700"
               onChange={(e) => setFormData({...formData, [item.id]: e.target.value})}
             />
@@ -196,19 +186,12 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         ))}
       </div>
 
-      {!isComplete && (
-        <div className="flex items-center justify-center gap-3 text-amber-400 bg-amber-400/5 p-6 rounded-3xl border border-amber-400/20 shadow-sm animate-pulse">
-          <AlertCircle size={24} />
-          <span className="text-base font-bold text-center">يرجى تعبئة الخانات النصية (رأيك الشخصي) لتفعيل زر الإرسال.</span>
-        </div>
-      )}
-
       <div className="space-y-6">
         <button 
-          disabled={!isComplete || loading}
+          disabled={loading}
           onClick={handleSubmit}
           className={`w-full py-7 rounded-full font-black text-2xl shadow-2xl transition-all duration-500 active:scale-95
-            ${isComplete && !loading 
+            ${!loading 
               ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_10px_40px_rgba(16,185,129,0.2)] cursor-pointer' 
               : 'bg-[#161b22] text-gray-700 border border-[#30363d] cursor-not-allowed'}`}
         >
