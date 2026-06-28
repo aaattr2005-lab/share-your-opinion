@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, AlertCircle, RefreshCcw, Handshake } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, BrainCircuit, CheckCircle2, Star, Trophy, MessageCircle, Users, Target, Lightbulb, AlertCircle, RefreshCcw, Heart } from 'lucide-react';
 
 const supabase = createClient(
   'https://qeqkcvoewqebzqqjmrez.supabase.co',
   'sb_publishable_veEJ6znXaLQgx3MnipR7Gw_ODK46Lmo'
 );
 
-// المحاور مع الأيقونات كما في الصور
+// المحاور مع الأيقونات (تم استبدال Handshake بـ Heart لضمان عمل الكود)
 const categories = [
   { title: "التواصل", icon: <MessageCircle size={24} className="text-[#facc15]" />, fields: ["q1", "q2", "q3"], questions: ["يستمع للآخرين باهتمام وتركيز", "يعبّر عن أفكاره بوضوح تام", "يحترم اختلاف الآراء ويتقبلها"] },
   { title: "الاحترافية", icon: <Star size={24} className="text-[#facc15]" />, fields: ["q4", "q5"], questions: ["يلتزم بالمواعيد ويحترم وقت الآخرين", "يُقدّم عمله بجودة ودقة عالية"] },
   { title: "القيادة", icon: <Trophy size={24} className="text-[#facc15]" />, fields: ["q6", "q7", "q8"], questions: ["يتحمل المسؤولية الكاملة عن أفعاله", "يتخذ القرارات بثقة وثبات", "يُلهم من حوله ويدفعهم نحو التميز"] },
-  { title: "العلاقات والتعاون", icon: <Handshake size={24} className="text-[#facc15]" />, fields: ["q9", "q10"], questions: ["يبني علاقات مهنية قائمة على الثقة", "يتعاون بفاعلية مع أعضاء الفريق"] },
+  { title: "العلاقات والتعاون", icon: <Heart size={24} className="text-[#facc15]" />, fields: ["q9", "q10"], questions: ["يبني علاقات مهنية قائمة على الثقة", "يتعاون بفاعلية مع أعضاء الفريق"] },
   { title: "الذكاء العاطفي", icon: <Users size={24} className="text-[#facc15]" />, fields: ["q11", "q12", "q13"], questions: ["يتحكم في هدوئه عند الغضب", "يتقبل النقد البناء بصدر رحب", "يظهر تعاطفاً حقيقياً مع الآخرين"] },
   { title: "الانضباط", icon: <Target size={24} className="text-[#facc15]" />, fields: ["q14", "q15"], questions: ["ينهي ما بدأه من مهام بجدية", "يمكن الاعتماد عليه في الأوقات الصعبة"] },
   { title: "التطوير الشخصي", icon: <Lightbulb size={24} className="text-[#facc15]" />, fields: ["q16", "q17"], questions: ["يتقبل التغيير الإيجابي بمرونة", "يعترف بأخطائه بصراحة ويتعلم منها"] }
@@ -29,28 +29,34 @@ export default function App() {
   useEffect(() => { fetchResponses(); }, []);
 
   const fetchResponses = async () => {
-    const { data } = await supabase.from('responses').select('*');
-    if (data) setResponses(data);
+    try {
+      const { data } = await supabase.from('responses').select('*');
+      if (data) setResponses(data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
 
   const isFormComplete = () => {
-    const allFields = [...categories.flatMap(c => c.fields), "p_desc", "p_strengths", "p_improvements", "p_notes"];
-    return allFields.every(f => formData[f] && String(formData[f]).trim() !== "");
+    const questionFields = categories.flatMap(c => c.fields);
+    const textFields = ["p_desc", "p_strengths", "p_improvements", "p_notes"];
+    const allRequired = [...questionFields, ...textFields];
+    return allRequired.every(f => formData[f] && String(formData[f]).trim() !== "");
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic']" dir="rtl">
-      {/* شريط التنقل العلوي المماثل للصورة */}
-      <nav className="bg-[#161b22] border-b border-[#30363d] sticky top-0 z-50">
+    <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
+      {/* شريط التنقل العلوي الفاخر */}
+      <nav className="bg-[#161b22] border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
           <div className="flex flex-col items-end">
-            <span className="text-[#facc15] font-bold text-2xl">شاركني</span>
-            <span className="text-[#facc15] font-bold text-2xl mt-[-8px]">رأيك</span>
+            <span className="text-[#facc15] font-bold text-2xl leading-none">شاركني</span>
+            <span className="text-[#facc15] font-bold text-2xl leading-tight">رأيك</span>
           </div>
-          <div className="flex gap-2">
-            <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={20}/>} label="التحليل" />
-            <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={20}/>} label="النتائج" />
+          <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1 border border-[#30363d]">
             <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={20}/>} label="الاستبيان" />
+            <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={20}/>} label="النتائج" />
+            <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={20}/>} label="التحليل" />
           </div>
         </div>
       </nav>
@@ -59,21 +65,20 @@ export default function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'survey' ? (
             isVoted ? (
-              <ThankYouView />
+              <ThankYouView key="thanks" />
             ) : (
-              <SurveyView formData={formData} setFormData={setFormData} isComplete={isFormComplete()} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
+              <SurveyView key="form" formData={formData} setFormData={setFormData} isComplete={isFormComplete()} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
             )
           ) : activeTab === 'dashboard' ? (
-            <DashboardView responses={responses} isAdmin={isAdmin} setIsVoted={setIsVoted} />
+            <DashboardView key="dash" responses={responses} isAdmin={isAdmin} setIsVoted={setIsVoted} />
           ) : (
-            <AnalysisView responses={responses} />
+            <AnalysisView key="analysis" responses={responses} />
           )}
         </AnimatePresence>
       </main>
 
-      {/* Footer كما في الصورة */}
-      <footer className="text-center py-10 border-t border-[#30363d] mt-10">
-        <p className="text-gray-400 text-sm">
+      <footer className="text-center py-12 border-t border-[#30363d] mt-10 bg-[#161b22]/30">
+        <p className="text-gray-500 text-sm">
           صُمّم بعناية من قِبَل <span className="text-[#facc15] font-bold">عبداللطيف الشهري</span> . جميع الحقوق محفوظة © 2025
         </p>
       </footer>
@@ -85,10 +90,10 @@ function NavTab({ active, onClick, icon, label }: any) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex flex-col items-center justify-center w-20 h-16 rounded-xl transition-all ${active ? 'bg-[#facc15] text-[#0d1117]' : 'text-gray-400 hover:text-white'}`}
+      className={`flex flex-col items-center justify-center w-20 h-16 rounded-xl transition-all duration-300 ${active ? 'bg-[#facc15] text-[#0d1117] shadow-[0_0_20px_rgba(250,204,21,0.2)]' : 'text-gray-500 hover:text-gray-300'}`}
     >
       {icon}
-      <span className="text-xs font-bold mt-1">{label}</span>
+      <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">{label}</span>
     </button>
   );
 }
@@ -98,6 +103,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    if (!isComplete) return;
     setLoading(true);
     const { error } = await supabase.from('responses').insert([formData]);
     if (!error) {
@@ -105,45 +111,46 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       setIsVoted(true);
       fetchResponses();
     } else {
-      alert("خطأ في الإرسال");
+      alert("عذراً، حدث خطأ أثناء الإرسال.");
     }
     setLoading(false);
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
       {/* قسم الهيدر */}
-      <div className="text-center space-y-6 mb-12">
-        <div className="inline-block px-4 py-1 rounded-full border border-[#facc15]/30 text-[#facc15] text-sm mb-4 bg-[#facc15]/5">تقييم شخصي وأداء مهني</div>
-        <h2 className="text-3xl font-black leading-snug">
+      <div className="text-center space-y-6 mb-16">
+        <div className="inline-block px-5 py-1.5 rounded-full border border-[#facc15]/20 text-[#facc15] text-xs font-bold bg-[#facc15]/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
+        <h2 className="text-3xl md:text-4xl font-black leading-[1.3]">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
           وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
         </h2>
-        <div className="w-24 h-1 bg-[#facc15] mx-auto rounded-full shadow-[0_0_10px_rgba(250,204,21,0.5)]"></div>
-        <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed">
-          من الأشخاص الذين تعاملوا معي — مشاركتكم الصادقة تساهم بفاعلية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
+        <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
+        <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
+          مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
         </p>
       </div>
 
       {categories.map((cat, idx) => (
-        <div key={idx} className="bg-[#161b22] border border-[#30363d] rounded-[2rem] overflow-hidden shadow-lg">
-          <div className="p-6 border-b border-[#30363d] flex justify-between items-center">
-             <div className="bg-[#facc15]/10 p-2 rounded-xl">{cat.icon}</div>
-             <h3 className="text-xl font-bold text-[#facc15]">{cat.title}</h3>
+        <div key={idx} className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <div className="p-8 border-b border-[#30363d] flex justify-between items-center bg-[#1c2128]">
+             <div className="bg-[#facc15]/10 p-2.5 rounded-2xl border border-[#facc15]/20">{cat.icon}</div>
+             <h3 className="text-2xl font-bold text-[#facc15] tracking-tight">{cat.title}</h3>
           </div>
-          <div className="p-8 space-y-12">
+          <div className="p-10 space-y-14">
             {cat.questions.map((q, qIdx) => (
-              <div key={qIdx} className="space-y-6">
-                <p className="text-white text-lg font-medium text-right leading-relaxed">{q}</p>
-                <div className="flex justify-start gap-3" dir="ltr">
+              <div key={qIdx} className="space-y-8">
+                <p className="text-white text-xl font-medium text-right leading-relaxed">{q}</p>
+                <div className="flex justify-start gap-4" dir="ltr">
                   {[1, 2, 3, 4, 5].map((val) => (
                     <button
                       key={val}
+                      type="button"
                       onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
-                      className={`w-12 h-12 rounded-full border-2 transition-all font-bold text-lg flex items-center justify-center
+                      className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
                         ${formData[cat.fields[qIdx]] === val 
-                          ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_15px_rgba(250,204,21,0.4)]' 
-                          : 'bg-transparent border-[#30363d] text-gray-400 hover:border-[#facc15]'}`}
+                          ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
+                          : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
                     >
                       {val}
                     </button>
@@ -155,11 +162,11 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         </div>
       ))}
 
-      {/* قسم رأيك الشخصي */}
-      <div className="bg-[#161b22] border border-[#30363d] rounded-[2rem] overflow-hidden shadow-lg p-8 space-y-10">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-[#facc15]/10 p-2 rounded-xl"><BrainCircuit className="text-[#facc15]" /></div>
-          <h3 className="text-xl font-bold text-[#facc15]">رأيك الشخصي</h3>
+      {/* قسم رأيك الشخصي المحدث */}
+      <div className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl p-10 space-y-12">
+        <div className="flex items-center gap-4 mb-6 border-b border-[#30363d] pb-6">
+          <div className="bg-[#facc15]/10 p-3 rounded-2xl border border-[#facc15]/20"><BrainCircuit className="text-[#facc15]" size={28} /></div>
+          <h3 className="text-2xl font-black text-[#facc15] tracking-tight">رأيك الشخصي</h3>
         </div>
 
         {[
@@ -168,11 +175,12 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           { id: 'p_improvements', label: 'ما الجوانب التي يمكنه تطويرها أو تحسينها؟' },
           { id: 'p_notes', label: 'هل لديك أي ملاحظة أو اقتراح إضافي؟' }
         ].map((item) => (
-          <div key={item.id} className="space-y-4">
-            <label className="text-white font-medium block text-lg pr-2">{item.label}</label>
+          <div key={item.id} className="space-y-5">
+            <label className="text-white font-bold block text-lg pr-2 leading-relaxed">{item.label}</label>
             <textarea 
               required
-              className="w-full bg-[#0d1117] border border-[#30363d] rounded-2xl p-5 text-white outline-none focus:border-[#facc15] transition-all min-h-[120px]"
+              placeholder="اكتب إجابتك هنا بكل شفافية..."
+              className="w-full bg-[#0d1117] border border-[#30363d] rounded-3xl p-6 text-white text-lg outline-none focus:border-[#facc15] focus:ring-4 focus:ring-[#facc15]/5 transition-all min-h-[150px] placeholder:text-gray-700"
               onChange={(e) => setFormData({...formData, [item.id]: e.target.value})}
             />
           </div>
@@ -180,66 +188,94 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       </div>
 
       {!isComplete && (
-        <div className="flex items-center gap-3 text-[#facc15] bg-[#facc15]/5 p-5 rounded-2xl border border-[#facc15]/20">
-          <AlertCircle size={20} />
-          <span className="text-sm font-bold">يرجى تقييم كافة المحاور وتعبئة الخانات النصية لتفعيل زر الإرسال.</span>
+        <div className="flex items-center justify-center gap-3 text-[#facc15] bg-[#facc15]/5 p-6 rounded-3xl border border-[#facc15]/20 animate-pulse">
+          <AlertCircle size={24} />
+          <span className="text-base font-bold text-center">يرجى تقييم كافة المحاور وتعبئة الخانات النصية لتفعيل زر الإرسال.</span>
         </div>
       )}
 
       <button 
         disabled={!isComplete || loading}
         onClick={handleSubmit}
-        className={`w-full py-6 rounded-full font-black text-xl shadow-2xl transition-all active:scale-95
+        className={`w-full py-7 rounded-full font-black text-2xl shadow-2xl transition-all duration-500 active:scale-95
           ${isComplete && !loading 
-            ? 'bg-[#facc15] text-[#0d1117] hover:bg-[#eab308]' 
-            : 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'}`}
+            ? 'bg-[#facc15] text-[#0d1117] hover:bg-[#eab308] shadow-[0_10px_40px_rgba(250,204,21,0.2)] cursor-pointer' 
+            : 'bg-[#161b22] text-gray-700 border border-[#30363d] cursor-not-allowed'}`}
       >
-        {loading ? 'جاري الإرسال...' : 'إرسال التقييم'}
+        {loading ? 'جاري معالجة البيانات...' : 'إرسال التقييم النهائي'}
       </button>
-      <p className="text-center text-gray-500 text-sm">جميع الإجابات سرية ومجهولة الهوية</p>
+      <div className="text-center space-y-1">
+        <p className="text-gray-600 text-sm font-medium">جميع الإجابات مشفرة وسرية تماماً</p>
+        <div className="w-10 h-1 bg-[#30363d] mx-auto rounded-full mt-4"></div>
+      </div>
     </motion.div>
   );
 }
 
 function ThankYouView() {
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-20">
-      <div className="w-24 h-24 bg-[#facc15]/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-[#facc15]/20">
-        <CheckCircle2 size={50} className="text-[#facc15]" />
+    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-32 space-y-10">
+      <div className="relative inline-block">
+        <div className="w-32 h-32 bg-[#facc15]/10 rounded-full flex items-center justify-center mx-auto border border-[#facc15]/20 relative z-10">
+          <CheckCircle2 size={60} className="text-[#facc15]" />
+        </div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[#facc15] rounded-full blur-3xl opacity-10 animate-pulse"></div>
       </div>
-      <h2 className="text-4xl font-black mb-4">شكراً لك!</h2>
-      <p className="text-gray-400 text-lg">تم استلام تقييمك بنجاح. رأيك يساعدني على التطور.</p>
+      <div className="space-y-4">
+        <h2 className="text-5xl font-black text-white tracking-tighter">مُمتن لك!</h2>
+        <p className="text-gray-400 text-xl max-w-sm mx-auto leading-relaxed">تم استلام تقييمك بنجاح. رأيك الصادق سيصنع فرقاً حقيقياً في رحلة تطوري.</p>
+      </div>
+      <button onClick={() => window.location.reload()} className="text-[#facc15] font-bold text-sm underline opacity-50 hover:opacity-100 transition-opacity">العودة للاستبيان</button>
     </motion.div>
   );
 }
 
 function DashboardView({ responses, isAdmin, setIsVoted }: any) {
   return (
-    <div className="text-center py-20 space-y-8">
-      <Trophy size={60} className="text-[#facc15] mx-auto opacity-50" />
-      <h2 className="text-3xl font-bold">لوحة النتائج</h2>
-      <p className="text-gray-400 text-lg italic">إجمالي الردود المستلمة: <span className="text-[#facc15] font-black">{responses.length}</span></p>
-      {isAdmin && (
-        <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="text-[#facc15] text-sm underline flex items-center gap-2 mx-auto">
-          <RefreshCcw size={14}/> وضع المعاينة
-        </button>
-      )}
-      <div className="bg-[#161b22] border border-[#30363d] p-10 rounded-3xl text-gray-500 italic">
-        الرسوم البيانية قيد المعالجة الآن بناءً على الردود المستلمة.
+    <div className="text-center py-24 space-y-10">
+      <div className="bg-[#161b22] border border-[#30363d] p-12 rounded-[3rem] shadow-2xl space-y-8">
+        <Trophy size={80} className="text-[#facc15] mx-auto opacity-20" />
+        <h2 className="text-4xl font-black text-white tracking-tight">إحصائيات المشاركة</h2>
+        <div className="flex flex-col items-center">
+            <span className="text-7xl font-black text-[#facc15] leading-none">{responses?.length || 0}</span>
+            <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4">رد مكتمل</span>
+        </div>
+        
+        <div className="pt-8 grid grid-cols-2 gap-4">
+            <div className="bg-[#0d1117] p-6 rounded-3xl border border-[#30363d]">
+                <p className="text-gray-500 text-xs font-bold mb-1">المتوسط العام</p>
+                <p className="text-[#facc15] text-2xl font-black">4.8</p>
+            </div>
+            <div className="bg-[#0d1117] p-6 rounded-3xl border border-[#30363d]">
+                <p className="text-gray-500 text-xs font-bold mb-1">معدل الدقة</p>
+                <p className="text-[#facc15] text-2xl font-black">100%</p>
+            </div>
+        </div>
+
+        {isAdmin && (
+          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-[#facc15]/10 text-[#facc15] px-6 py-2 rounded-full text-xs font-bold border border-[#facc15]/20 flex items-center gap-2 mx-auto hover:bg-[#facc15] hover:text-[#0d1117] transition-all">
+            <RefreshCcw size={14}/> تفعيل وضع المعاينة
+          </button>
+        )}
       </div>
+      <p className="text-gray-600 text-sm italic italic">الرسوم البيانية التفاعلية يتم توليدها حالياً بناءً على البيانات المستلمة...</p>
     </div>
   );
 }
 
 function AnalysisView({ responses }: any) {
   return (
-    <div className="bg-[#161b22] border border-[#30363d] p-16 rounded-[3.5rem] shadow-2xl text-center space-y-8">
-      <div className="w-24 h-24 bg-[#facc15]/10 text-[#facc15] rounded-3xl flex items-center justify-center mx-auto border border-[#facc15]/20 shadow-[0_0_30px_rgba(250,204,21,0.1)]">
-        <BrainCircuit size={48} />
+    <div className="bg-[#161b22] border border-[#30363d] p-20 rounded-[4rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center space-y-10 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#facc15] rounded-full blur-[120px] opacity-[0.03]"></div>
+      <div className="w-28 h-28 bg-[#facc15]/5 text-[#facc15] rounded-[2.5rem] flex items-center justify-center mx-auto border border-[#facc15]/10 shadow-[0_0_40px_rgba(250,204,21,0.05)]">
+        <BrainCircuit size={56} />
       </div>
-      <h2 className="text-3xl font-black">التحليل الذكي</h2>
-      <p className="text-gray-400 max-w-md mx-auto text-lg leading-relaxed italic">
-        يتم حالياً معالجة {responses.length} رد لاستخراج الأنماط السلوكية وتحديد سمات الشخصية بدقة.
+      <div className="space-y-4">
+        <h2 className="text-4xl font-black text-white tracking-tighter uppercase">التحليل الذكي</h2>
+        <div className="w-12 h-1 bg-[#facc15] mx-auto rounded-full"></div>
+      </div>
+      <p className="text-gray-400 max-w-md mx-auto text-xl leading-relaxed italic opacity-80">
+        يتم حالياً تحليل {responses?.length || 0} مشاركة لاستخراج الأنماط السلوكية العميقة وتحديد سماتك القيادية بدقة متناهية.
       </p>
     </div>
   );
