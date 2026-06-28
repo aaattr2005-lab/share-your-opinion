@@ -102,7 +102,7 @@ function SurveyView({ isVoted, onFinish }: any) {
   return (
     <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit} className="space-y-10">
       <div className="text-center mb-16">
-              <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="mb-3 text-white">استبيان التقييم والتطوير المهني</h2>
+              <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="mb-3 text-white">انا عبداللطيف الشهري كيف تصف شخصيتي بشكل عام</h2>
 <p style={{ fontSize: '18px', fontWeight: '400' }} className="text-slate-400 max-w-2xl mx-auto">مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.</p>
       </div>
       
