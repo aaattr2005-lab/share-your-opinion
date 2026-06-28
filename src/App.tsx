@@ -4,7 +4,7 @@ import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler,
 import { Radar, Bar } from 'react-chartjs-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import { LayoutDashboard, ClipboardList, BrainCircuit, Download, CheckCircle2, Star, Target, Lightbulb, TrendingUp, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, BrainCircuit, Download, CheckCircle2, Star, Target, Lightbulb, TrendingUp, AlertCircle, RefreshCcw } from 'lucide-react';
 
 // --- إعدادات الربط بقاعدة البيانات ---
 const supabase = createClient(
@@ -39,12 +39,18 @@ export default function App() {
     if (data) setResponses(data);
   };
 
+  // دالة لإعادة تعيين الحالة للمسؤول فقط
+  const resetAdminVote = () => {
+    localStorage.removeItem('voted_status');
+    setIsVoted(false);
+    setActiveTab('survey');
+  };
+
   return (
     <div className="min-h-screen bg-[#f0f7ff] text-slate-900 font-['IBM_Plex_Sans_Arabic']" dir="rtl">
-      {/* الهيدر العلوي */}
       <nav className="border-b border-blue-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
-          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">شارك رأيك</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">عبداللطيف الشهري</h1>
           <div className="flex bg-blue-50 p-1.5 rounded-2xl gap-1 border border-blue-100">
             <TabButton active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" />
             <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" />
@@ -56,7 +62,7 @@ export default function App() {
       <main className="max-w-5xl mx-auto py-12 px-6">
         <AnimatePresence mode="wait">
           {activeTab === 'survey' && <SurveyView key="survey" isVoted={isVoted} onFinish={() => {setIsVoted(true); fetchResponses();}} />}
-          {activeTab === 'dashboard' && <DashboardView key="dash" responses={responses} />}
+          {activeTab === 'dashboard' && <DashboardView key="dash" responses={responses} onReset={resetAdminVote} />}
           {activeTab === 'analysis' && <AnalysisView key="analysis" responses={responses} />}
         </AnimatePresence>
       </main>
@@ -77,11 +83,9 @@ function SurveyView({ isVoted, onFinish }: any) {
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
-  // دالة للتحقق من أن المستخدم أجاب على كل شيء
   const isFormComplete = () => {
     const allQuestionFields = categories.flatMap(cat => cat.fields);
     const requiredFields = [...allQuestionFields, "best_trait", "to_improve"];
-    
     return requiredFields.every(field => {
         const val = formData[field];
         return val !== undefined && val !== null && String(val).trim() !== "";
@@ -155,7 +159,6 @@ function SurveyView({ isVoted, onFinish }: any) {
         </div>
       </div>
 
-      {/* رسالة تنبيه تظهر فقط إذا كان النموذج غير مكتمل */}
       {!isComplete && (
         <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center gap-3 text-amber-700">
           <AlertCircle size={20} />
@@ -180,7 +183,7 @@ function SurveyView({ isVoted, onFinish }: any) {
 }
 
 // --- 2. صفحة لوحة التحكم (النتائج) ---
-function DashboardView({ responses }: { responses: any[] }) {
+function DashboardView({ responses, onReset }: { responses: any[], onReset: () => void }) {
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(responses);
     const wb = XLSX.utils.book_new();
@@ -206,9 +209,15 @@ function DashboardView({ responses }: { responses: any[] }) {
     <div className="space-y-10 animate-in fade-in">
       <div className="flex justify-between items-center mb-12">
         <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="text-blue-900">نتائج التقييم</h2>
-        <button onClick={exportToExcel} className="flex items-center gap-2 bg-white border border-blue-200 px-6 py-2.5 rounded-xl hover:bg-blue-50 text-blue-600 transition-all shadow-sm">
-          <Download size={18}/> <span className="font-bold">تصدير Excel</span>
-        </button>
+        <div className="flex gap-3">
+          {/* زر سري للمسؤول لإعادة تعيين حالته الشخصية والرجوع للاستبيان */}
+          <button onClick={onReset} className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-100 text-blue-600 transition-all text-sm font-bold">
+            <RefreshCcw size={16}/> وضع المعاينة
+          </button>
+          <button onClick={exportToExcel} className="flex items-center gap-2 bg-white border border-blue-200 px-6 py-2.5 rounded-xl hover:bg-blue-50 text-blue-600 transition-all shadow-sm font-bold">
+            <Download size={18}/> تصدير Excel
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
