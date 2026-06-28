@@ -45,7 +45,7 @@ export default function App() {
       {/* الهيدر العلوي */}
       <nav className="border-b border-blue-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
-          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">شارك رايك</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">شارك رأيك</h1>
           <div className="flex bg-blue-50 p-1.5 rounded-2xl gap-1 border border-blue-100">
             <TabButton active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" />
             <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" />
