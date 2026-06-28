@@ -29,6 +29,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'survey' | 'dashboard' | 'analysis'>('survey');
   const [responses, setResponses] = useState<any[]>([]);
   const [isVoted, setIsVoted] = useState(localStorage.getItem('voted_status') === 'true');
+  
+  // التحقق مما إذا كان المستخدم هو المسؤول عبر الرابط
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
   useEffect(() => {
     fetchResponses();
@@ -39,7 +42,6 @@ export default function App() {
     if (data) setResponses(data);
   };
 
-  // دالة لإعادة تعيين الحالة للمسؤول فقط
   const resetAdminVote = () => {
     localStorage.removeItem('voted_status');
     setIsVoted(false);
@@ -62,7 +64,7 @@ export default function App() {
       <main className="max-w-5xl mx-auto py-12 px-6">
         <AnimatePresence mode="wait">
           {activeTab === 'survey' && <SurveyView key="survey" isVoted={isVoted} onFinish={() => {setIsVoted(true); fetchResponses();}} />}
-          {activeTab === 'dashboard' && <DashboardView key="dash" responses={responses} onReset={resetAdminVote} />}
+          {activeTab === 'dashboard' && <DashboardView key="dash" responses={responses} onReset={resetAdminVote} showAdminBtn={isAdmin} />}
           {activeTab === 'analysis' && <AnalysisView key="analysis" responses={responses} />}
         </AnimatePresence>
       </main>
@@ -183,7 +185,7 @@ function SurveyView({ isVoted, onFinish }: any) {
 }
 
 // --- 2. صفحة لوحة التحكم (النتائج) ---
-function DashboardView({ responses, onReset }: { responses: any[], onReset: () => void }) {
+function DashboardView({ responses, onReset, showAdminBtn }: { responses: any[], onReset: () => void, showAdminBtn: boolean }) {
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(responses);
     const wb = XLSX.utils.book_new();
@@ -210,10 +212,12 @@ function DashboardView({ responses, onReset }: { responses: any[], onReset: () =
       <div className="flex justify-between items-center mb-12">
         <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="text-blue-900">نتائج التقييم</h2>
         <div className="flex gap-3">
-          {/* زر سري للمسؤول لإعادة تعيين حالته الشخصية والرجوع للاستبيان */}
-          <button onClick={onReset} className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-100 text-blue-600 transition-all text-sm font-bold">
-            <RefreshCcw size={16}/> وضع المعاينة
-          </button>
+          {/* لن يظهر هذا الزر إلا إذا كان الرابط يحتوي على ?admin=true */}
+          {showAdminBtn && (
+            <button onClick={onReset} className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-100 text-blue-600 transition-all text-sm font-bold">
+              <RefreshCcw size={16}/> وضع المعاينة
+            </button>
+          )}
           <button onClick={exportToExcel} className="flex items-center gap-2 bg-white border border-blue-200 px-6 py-2.5 rounded-xl hover:bg-blue-50 text-blue-600 transition-all shadow-sm font-bold">
             <Download size={18}/> تصدير Excel
           </button>
