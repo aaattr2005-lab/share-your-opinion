@@ -34,11 +34,10 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
+  // تعديل الشرط: الآن الخانات النصية فقط هي الإلزامية (لأن التقييمات اختيارية بناءً على طلبك)
   const isFormComplete = () => {
-    const questionFields = categories.flatMap(c => c.fields);
     const textFields = ["p_desc", "p_notes"];
-    const allRequired = [...questionFields, ...textFields];
-    return allRequired.every(f => formData[f] && String(formData[f]).trim() !== "");
+    return textFields.every(f => formData[f] && String(formData[f]).trim() !== "");
   };
 
   return (
@@ -46,33 +45,13 @@ export default function App() {
       
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
-          
           <div className="flex items-center gap-2">
             <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap">شارك رأيك</span>
           </div>
-
           <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
-            <NavTab 
-              active={activeTab === 'analysis'} 
-              onClick={() => setActiveTab('analysis')} 
-              icon={<BrainCircuit size={18}/>} 
-              label="التحليل" 
-              activeColor="bg-purple-600 shadow-purple-900/20"
-            />
-            <NavTab 
-              active={activeTab === 'dashboard'} 
-              onClick={() => setActiveTab('dashboard')} 
-              icon={<LayoutDashboard size={18}/>} 
-              label="النتائج" 
-              activeColor="bg-blue-600 shadow-blue-900/20"
-            />
-            <NavTab 
-              active={activeTab === 'survey'} 
-              onClick={() => setActiveTab('survey')} 
-              icon={<ClipboardList size={18}/>} 
-              label="الاستبيان" 
-              activeColor="bg-emerald-600 shadow-emerald-900/20"
-            />
+            <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={18}/>} label="التحليل" activeColor="bg-purple-600 shadow-purple-900/20" />
+            <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" activeColor="bg-blue-600 shadow-blue-900/20" />
+            <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" activeColor="bg-emerald-600 shadow-emerald-900/20" />
           </div>
         </div>
       </nav>
@@ -102,10 +81,7 @@ export default function App() {
 
 function NavTab({ active, onClick, icon, label, activeColor }: any) {
   return (
-    <button 
-      onClick={onClick} 
-      className={`flex flex-col items-center justify-center w-[70px] md:w-20 h-16 rounded-xl transition-all duration-500 ${active ? `${activeColor} text-white shadow-lg scale-105` : 'text-gray-500 hover:text-gray-300'}`}
-    >
+    <button onClick={onClick} className={`flex flex-col items-center justify-center w-[70px] md:w-20 h-16 rounded-xl transition-all duration-500 ${active ? `${activeColor} text-white shadow-lg scale-105` : 'text-gray-500 hover:text-gray-300'}`}>
       {icon}
       <span className="text-[10px] font-black mt-1 uppercase tracking-widest">{label}</span>
     </button>
@@ -137,13 +113,17 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic text-center">
             مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
           </p>
-          <div className="bg-[#facc15]/5 border border-[#facc15]/20 p-5 rounded-2xl max-w-xl mx-auto shadow-sm">
-            <p className="text-[#facc15] text-sm leading-relaxed font-medium text-center">
+          <div className="bg-[#facc15]/5 border border-[#facc15]/20 p-6 rounded-2xl max-w-xl mx-auto shadow-sm space-y-3">
+            <p className="text-[#facc15] text-sm leading-relaxed font-bold text-center">
               يرجى تقييم العبارات التالية باستخدام مقياس خماسي، حيث يعكس الرقم (1) أقل درجة من الرضا أو التوافق، بينما يعكس الرقم (5) أعلى درجة من الرضا أو التوافق.
+            </p>
+            {/* الجملة الجديدة المضافة هنا */}
+            <p className="text-white/70 text-xs leading-relaxed text-center">
+              في حال عدم توفر معرفة كافية للإجابة على أي سؤال، نرجو تركه فارغًا وعدم اختيار أي تقييم، لضمان دقة وموضوعية النتائج.
             </p>
           </div>
         </div>
@@ -173,6 +153,20 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
                       {val}
                     </button>
                   ))}
+                  {/* زر مسح الاختيار (إذا أراد المستخدم تركه فارغاً بعد أن اختار بالخطأ) */}
+                  {formData[cat.fields[qIdx]] && (
+                    <button 
+                       type="button"
+                       onClick={() => {
+                         const newData = {...formData};
+                         delete newData[cat.fields[qIdx]];
+                         setFormData(newData);
+                       }}
+                       className="text-gray-600 hover:text-rose-500 transition-colors mr-2"
+                    >
+                      <RefreshCcw size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -205,7 +199,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
       {!isComplete && (
         <div className="flex items-center justify-center gap-3 text-amber-400 bg-amber-400/5 p-6 rounded-3xl border border-amber-400/20 shadow-sm animate-pulse">
           <AlertCircle size={24} />
-          <span className="text-base font-bold text-center">يرجى تقييم كافة المحاور وتعبئة الخانات النصية لتفعيل زر الإرسال.</span>
+          <span className="text-base font-bold text-center">يرجى تعبئة الخانات النصية (رأيك الشخصي) لتفعيل زر الإرسال.</span>
         </div>
       )}
 
@@ -221,7 +215,6 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           {loading ? 'جاري معالجة البيانات...' : 'إرسال التقييم النهائي'}
         </button>
 
-        {/* النص الجديد المطلوب أسفل زر الإرسال */}
         <div className="flex items-center justify-center gap-2 text-gray-500 px-6">
           <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
           <p className="text-xs md:text-sm leading-relaxed text-center font-medium">
@@ -260,7 +253,6 @@ function DashboardView({ responses, isAdmin, setIsVoted }: any) {
             <span className="text-7xl font-black text-blue-500 leading-none">{responses?.length || 0}</span>
             <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4 text-center">رد مكتمل</span>
         </div>
-        
         {isAdmin && (
           <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all">
             <RefreshCcw size={14}/> تفعيل وضع المعاينة
