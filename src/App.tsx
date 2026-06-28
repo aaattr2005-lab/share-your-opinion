@@ -44,14 +44,16 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
-      {/* شريط التنقل العلوي */}
+      {/* شريط التنقل العلوي المطور */}
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
           
+          {/* الشعار بجانب بعض */}
           <div className="flex items-center gap-2">
             <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap">شارك رأيك</span>
           </div>
 
+          {/* الأزرار الملونة */}
           <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
             <NavTab 
               active={activeTab === 'analysis'} 
@@ -92,6 +94,7 @@ export default function App() {
         </AnimatePresence>
       </main>
 
+      {/* Footer مع تحديث التاريخ */}
       <footer className="text-center py-12 border-t border-[#30363d] mt-10 bg-[#161b22]/30">
         <p className="text-gray-500 text-sm">
           صُمّم بعناية من قِبَل <span className="text-[#facc15] font-bold">عبداللطيف الشهري</span> . جميع الحقوق محفوظة © 2026
@@ -135,7 +138,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         <div className="inline-block px-5 py-1.5 rounded-full border border-emerald-500/20 text-emerald-400 text-xs font-bold bg-emerald-500/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
         <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
-          وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية
+          وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
         <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
@@ -153,29 +156,20 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
             {cat.questions.map((q, qIdx) => (
               <div key={qIdx} className="space-y-8 text-right">
                 <p className="text-white text-xl font-medium leading-relaxed">{q}</p>
-                
-                <div className="space-y-4">
-                  {/* حاوية الأرقام مع التسميات ضعيف وممتاز */}
-                  <div className="flex justify-between items-center px-1">
-                    <span className="text-rose-500 text-xs font-bold">ضعيف</span>
-                    <span className="text-emerald-500 text-xs font-bold">ممتاز</span>
-                  </div>
-                  
-                  <div className="flex justify-start gap-4" dir="ltr">
-                    {[1, 2, 3, 4, 5].map((val) => (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
-                        className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
-                          ${formData[cat.fields[qIdx]] === val 
-                            ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
-                            : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
-                      >
-                        {val}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex justify-start gap-4" dir="ltr">
+                  {[1, 2, 3, 4, 5].map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
+                      className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
+                        ${formData[cat.fields[qIdx]] === val 
+                          ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
+                          : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
+                    >
+                      {val}
+                    </button>
+                  ))}
                 </div>
               </div>
             ))}
@@ -199,7 +193,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
             <label className="text-white font-bold block text-lg pr-2 leading-relaxed">{item.label}</label>
             <textarea 
               required
-              placeholder="اكتب إجابتك هنا بكل شفافية..."
+              placeholder="اكتب إجابتك هنا..."
               className="w-full bg-[#0d1117] border border-[#30363d] rounded-3xl p-6 text-white text-lg outline-none focus:border-[#facc15] focus:ring-4 focus:ring-[#facc15]/5 transition-all min-h-[150px] placeholder:text-gray-700"
               onChange={(e) => setFormData({...formData, [item.id]: e.target.value})}
             />
@@ -257,7 +251,7 @@ function DashboardView({ responses, isAdmin, setIsVoted }: any) {
         </div>
         
         {isAdmin && (
-          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all text-right">
+          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all">
             <RefreshCcw size={14}/> تفعيل وضع المعاينة
           </button>
         )}
