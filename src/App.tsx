@@ -30,7 +30,7 @@ export default function App() {
   const [responses, setResponses] = useState<any[]>([]);
   const [isVoted, setIsVoted] = useState(localStorage.getItem('voted_status') === 'true');
   
-  // التحقق مما إذا كان المستخدم هو المسؤول عبر الرابط
+  // التحقق من صلاحية المسؤول عبر الرابط السري ?admin=true
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
   useEffect(() => {
@@ -50,9 +50,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f0f7ff] text-slate-900 font-['IBM_Plex_Sans_Arabic']" dir="rtl">
+      {/* الهيدر العلوي - تم تعديل العنوان هنا */}
       <nav className="border-b border-blue-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-20 flex justify-between items-center">
-          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">عبداللطيف الشهري</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: '700' }} className="text-blue-600">شاركني رأيك</h1>
           <div className="flex bg-blue-50 p-1.5 rounded-2xl gap-1 border border-blue-100">
             <TabButton active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" />
             <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" />
@@ -88,6 +89,7 @@ function SurveyView({ isVoted, onFinish }: any) {
   const isFormComplete = () => {
     const allQuestionFields = categories.flatMap(cat => cat.fields);
     const requiredFields = [...allQuestionFields, "best_trait", "to_improve"];
+    
     return requiredFields.every(field => {
         const val = formData[field];
         return val !== undefined && val !== null && String(val).trim() !== "";
@@ -212,14 +214,13 @@ function DashboardView({ responses, onReset, showAdminBtn }: { responses: any[],
       <div className="flex justify-between items-center mb-12">
         <h2 style={{ fontSize: '32px', fontWeight: '700' }} className="text-blue-900">نتائج التقييم</h2>
         <div className="flex gap-3">
-          {/* لن يظهر هذا الزر إلا إذا كان الرابط يحتوي على ?admin=true */}
           {showAdminBtn && (
             <button onClick={onReset} className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-100 text-blue-600 transition-all text-sm font-bold">
               <RefreshCcw size={16}/> وضع المعاينة
             </button>
           )}
           <button onClick={exportToExcel} className="flex items-center gap-2 bg-white border border-blue-200 px-6 py-2.5 rounded-xl hover:bg-blue-50 text-blue-600 transition-all shadow-sm font-bold">
-            <Download size={18}/> تصدير Excel
+            <Download size={18}/> <span className="font-bold">تصدير Excel</span>
           </button>
         </div>
       </div>
