@@ -133,18 +133,17 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
       <div className="text-center space-y-6 mb-16">
         <div className="inline-block px-5 py-1.5 rounded-full border border-emerald-500/20 text-emerald-400 text-xs font-bold bg-emerald-500/5 tracking-widest uppercase mb-4">تقييم شخصي وأداء مهني</div>
-        <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white">
+        <h2 className="text-3xl md:text-4xl font-black leading-[1.3] text-white text-center">
           أنا <span className="text-[#facc15]">عبداللطيف الشهري</span>، <br />
-          وقد صممت هذا الموقع للحصول على آراء صادقة وموضوعية
+          وقد صممت هذا الموقع بهدف الحصول على آراء صادقة وموضوعية
         </h2>
         <div className="w-24 h-1.5 bg-[#facc15] mx-auto rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]"></div>
         <div className="space-y-4">
-          <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic">
+          <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed italic text-center">
             مشاركتكم الصادقة تساهم بفعالية في تحديد نقاط القوة وفرص التحسين لرفع كفاءة الأداء الشخصي والمهني.
           </p>
-          {/* الجملة الجديدة المطلوبة */}
-          <div className="bg-[#facc15]/5 border border-[#facc15]/20 p-5 rounded-2xl max-w-xl mx-auto">
-            <p className="text-[#facc15] text-sm leading-relaxed font-medium">
+          <div className="bg-[#facc15]/5 border border-[#facc15]/20 p-5 rounded-2xl max-w-xl mx-auto shadow-sm">
+            <p className="text-[#facc15] text-sm leading-relaxed font-medium text-center">
               يرجى تقييم العبارات التالية باستخدام مقياس خماسي، حيث يعكس الرقم (1) أقل درجة من الرضا أو التوافق، بينما يعكس الرقم (5) أعلى درجة من الرضا أو التوافق.
             </p>
           </div>
@@ -162,27 +161,20 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
               <div key={qIdx} className="space-y-8 text-right">
                 <p className="text-white text-xl font-medium leading-relaxed">{q}</p>
                 
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center px-1">
-                    <span className="text-rose-500 text-[10px] font-bold uppercase tracking-wider">ضعيف</span>
-                    <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-wider">ممتاز</span>
-                  </div>
-                  
-                  <div className="flex justify-start gap-4" dir="ltr">
-                    {[1, 2, 3, 4, 5].map((val) => (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
-                        className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
-                          ${formData[cat.fields[qIdx]] === val 
-                            ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
-                            : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
-                      >
-                        {val}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex justify-start gap-4" dir="ltr">
+                  {[1, 2, 3, 4, 5].map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setFormData({...formData, [cat.fields[qIdx]]: val})}
+                      className={`w-14 h-14 rounded-full border-2 transition-all duration-300 font-black text-xl flex items-center justify-center
+                        ${formData[cat.fields[qIdx]] === val 
+                          ? 'bg-[#facc15] border-[#facc15] text-[#0d1117] shadow-[0_0_25px_rgba(250,204,21,0.4)] scale-110' 
+                          : 'bg-transparent border-[#30363d] text-gray-500 hover:border-[#facc15] hover:text-[#facc15]'}`}
+                    >
+                      {val}
+                    </button>
+                  ))}
                 </div>
               </div>
             ))}
@@ -190,7 +182,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
         </div>
       ))}
 
-      <div className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl p-10 space-y-12">
+      <div className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl p-10 space-y-12 text-right">
         <div className="flex items-center gap-4 mb-6 border-b border-[#30363d] pb-6">
           <div className="bg-[#facc15]/10 p-3 rounded-2xl border border-[#facc15]/20"><BrainCircuit className="text-[#facc15]" size={28} /></div>
           <h3 className="text-2xl font-black text-[#facc15] tracking-tight">رأيك الشخصي</h3>
@@ -200,7 +192,7 @@ function SurveyView({ formData, setFormData, isComplete, setIsVoted, fetchRespon
           { id: 'p_desc', label: 'كيف تصف شخصية عبداللطيف الشهري بشكل عام؟' },
           { id: 'p_notes', label: 'هل لديك أي ملاحظة أو اقتراح إضافي؟' }
         ].map((item) => (
-          <div key={item.id} className="space-y-5 text-right">
+          <div key={item.id} className="space-y-5">
             <label className="text-white font-bold block text-lg pr-2 leading-relaxed">{item.label}</label>
             <textarea 
               required
@@ -252,13 +244,13 @@ function ThankYouView() {
 
 function DashboardView({ responses, isAdmin, setIsVoted }: any) {
   return (
-    <div className="text-center py-24 space-y-10 text-right">
+    <div className="text-center py-24 space-y-10">
       <div className="bg-[#161b22] border border-blue-500/20 p-12 rounded-[3rem] shadow-2xl space-y-8">
         <Trophy size={80} className="text-blue-500 mx-auto opacity-20" />
         <h2 className="text-4xl font-black text-white tracking-tight text-center">إحصائيات المشاركة</h2>
         <div className="flex flex-col items-center">
             <span className="text-7xl font-black text-blue-500 leading-none">{responses?.length || 0}</span>
-            <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4">رد مكتمل</span>
+            <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4 text-center">رد مكتمل</span>
         </div>
         
         {isAdmin && (
@@ -282,7 +274,7 @@ function AnalysisView({ responses }: any) {
         <h2 className="text-4xl font-black text-white tracking-tighter">التحليل الذكي</h2>
         <div className="w-12 h-1 bg-purple-500 mx-auto rounded-full"></div>
       </div>
-      <p className="text-gray-400 max-w-md mx-auto text-xl leading-relaxed italic opacity-80">
+      <p className="text-gray-400 max-w-md mx-auto text-xl leading-relaxed italic opacity-80 text-center">
         يتم حالياً معالجة {responses?.length || 0} رد لاستخراج الأنماط السلوكية العميقة.
       </p>
     </div>
