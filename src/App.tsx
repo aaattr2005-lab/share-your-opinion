@@ -23,9 +23,15 @@ export default function App() {
   const [formData, setFormData] = useState<any>({});
   const [responses, setResponses] = useState<any[]>([]);
   const [isVoted, setIsVoted] = useState(localStorage.getItem('voted_status') === 'true');
+  
+  // التحقق من صلاحية المسؤول عبر الرابط السري ?admin=true
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
-  useEffect(() => { fetchResponses(); }, []);
+  useEffect(() => { 
+    fetchResponses();
+    // إذا لم يكن مسؤولاً، نجبره دائماً على رؤية الاستبيان فقط
+    if (!isAdmin) setActiveTab('survey');
+  }, [isAdmin]);
 
   const fetchResponses = async () => {
     try {
@@ -34,33 +40,43 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
+  const isFormComplete = () => {
+    const textFields = ["p_desc", "p_notes"];
+    return textFields.every(f => formData[f] && String(formData[f]).trim() !== "");
+  };
+
   return (
     <div className="min-h-screen bg-[#0d1117] text-white font-['IBM_Plex_Sans_Arabic'] text-right" dir="rtl">
       
       <nav className="bg-[#161b22]/90 backdrop-blur-xl border-b border-[#30363d] sticky top-0 z-50 shadow-2xl">
         <div className="max-w-5xl mx-auto px-4 flex justify-between items-center h-20">
+          
           <div className="flex items-center gap-2">
             <span className="text-[#facc15] font-black text-2xl tracking-tighter whitespace-nowrap">شارك رأيك</span>
           </div>
-          <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
-            <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={18}/>} label="التحليل" activeColor="bg-purple-600 shadow-purple-900/20" />
-            <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" activeColor="bg-blue-600 shadow-blue-900/20" />
-            <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" activeColor="bg-emerald-600 shadow-emerald-900/20" />
-          </div>
+
+          {/* التعديل: تظهر الأزرار فقط إذا كان المستخدم مسؤولاً */}
+          {isAdmin && (
+            <div className="flex bg-[#0d1117] p-1.5 rounded-2xl gap-1.5 border border-[#30363d]">
+              <NavTab active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} icon={<BrainCircuit size={18}/>} label="التحليل" activeColor="bg-purple-600 shadow-purple-900/20" />
+              <NavTab active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18}/>} label="النتائج" activeColor="bg-blue-600 shadow-blue-900/20" />
+              <NavTab active={activeTab === 'survey'} onClick={() => setActiveTab('survey')} icon={<ClipboardList size={18}/>} label="الاستبيان" activeColor="bg-emerald-600 shadow-emerald-900/20" />
+            </div>
+          )}
         </div>
       </nav>
 
       <main className="max-w-2xl mx-auto py-10 px-4">
         <AnimatePresence mode="wait">
           {activeTab === 'survey' ? (
-            isVoted ? ( <ThankYouView key="thanks" /> ) : (
-              <SurveyView formData={formData} setFormData={setFormData} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
+            isVoted ? ( <ThankYouView key="thanks" isAdmin={isAdmin} setIsVoted={setIsVoted} /> ) : (
+              <SurveyView key="form" formData={formData} setFormData={setFormData} setIsVoted={setIsVoted} fetchResponses={fetchResponses} />
             )
-          ) : activeTab === 'dashboard' ? (
+          ) : isAdmin && activeTab === 'dashboard' ? (
             <DashboardView responses={responses} isAdmin={isAdmin} setIsVoted={setIsVoted} />
-          ) : (
+          ) : isAdmin && activeTab === 'analysis' ? (
             <AnalysisView responses={responses} />
-          )}
+          ) : null}
         </AnimatePresence>
       </main>
 
@@ -125,7 +141,7 @@ function SurveyView({ formData, setFormData, setIsVoted, fetchResponses }: any) 
         <div key={idx} className="bg-[#161b22] border border-[#30363d] rounded-[2.5rem] overflow-hidden shadow-2xl">
           <div className="p-8 border-b border-[#30363d] flex justify-between items-center bg-[#1c2128]">
              <div className="bg-[#facc15]/10 p-2.5 rounded-2xl border border-[#facc15]/20">{cat.icon}</div>
-             <h3 className="text-2xl font-bold text-[#facc15] tracking-tight">{cat.title}</h3>
+             <h3 className="text-2xl font-bold text-[#facc15] tracking-tight text-right">{cat.title}</h3>
           </div>
           <div className="p-10 space-y-14">
             {cat.questions.map((q, qIdx) => (
@@ -209,7 +225,7 @@ function SurveyView({ formData, setFormData, setIsVoted, fetchResponses }: any) 
   );
 }
 
-function ThankYouView() {
+function ThankYouView({ isAdmin, setIsVoted }: any) {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-32 space-y-10">
       <div className="relative inline-block">
@@ -222,6 +238,9 @@ function ThankYouView() {
         <h2 className="text-5xl font-black text-white tracking-tighter">مُمتن لك!</h2>
         <p className="text-gray-400 text-xl max-w-sm mx-auto leading-relaxed">تم استلام تقييمك بنجاح. رأيك الصادق سيصنع فرقاً حقيقياً في رحلة تطوري.</p>
       </div>
+      {isAdmin && (
+          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="text-[#facc15] font-bold text-sm underline opacity-50 hover:opacity-100 transition-all mt-10">إعادة تجربة الاستبيان (للمسؤول)</button>
+      )}
     </motion.div>
   );
 }
@@ -236,11 +255,9 @@ function DashboardView({ responses, isAdmin, setIsVoted }: any) {
             <span className="text-7xl font-black text-blue-500 leading-none">{responses?.length || 0}</span>
             <span className="text-gray-500 font-bold uppercase tracking-[0.3em] text-xs mt-4 text-center">رد مكتمل</span>
         </div>
-        {isAdmin && (
-          <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all">
-            <RefreshCcw size={14}/> تفعيل وضع المعاينة
-          </button>
-        )}
+        <button onClick={() => { localStorage.removeItem('voted_status'); setIsVoted(false); }} className="bg-blue-500/10 text-blue-400 px-6 py-2 rounded-full text-xs font-bold border border-blue-500/20 flex items-center gap-2 mx-auto hover:bg-blue-500 hover:text-white transition-all">
+          <RefreshCcw size={14}/> تفعيل وضع المعاينة
+        </button>
       </div>
     </div>
   );
@@ -254,7 +271,7 @@ function AnalysisView({ responses }: any) {
         <BrainCircuit size={56} />
       </div>
       <div className="space-y-4">
-        <h2 className="text-4xl font-black text-white tracking-tighter">التحليل الذكي</h2>
+        <h2 className="text-4xl font-black text-white tracking-tighter text-center w-full">التحليل الذكي</h2>
         <div className="w-12 h-1 bg-purple-500 mx-auto rounded-full"></div>
       </div>
       <p className="text-gray-400 max-w-md mx-auto text-xl leading-relaxed italic opacity-80 text-center">
